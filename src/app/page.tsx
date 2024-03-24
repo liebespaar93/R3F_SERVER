@@ -1,6 +1,5 @@
 import SiteInfo from "@/components/info/SiteInfo";
 import SocketTest from "@/components/socket/SocketTest";
-import Image from "next/image";
 
 export default function Home() {
   return (

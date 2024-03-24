@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { CardContent } from '../ui/card'
+import { CardContent } from '@/components/ui/card'
 
 type ServerInfoProps = {
 

@@ -1,28 +1,10 @@
-"use client"
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { CodeBlockComponent, CopyBlockComponent } from '@/components/codeblock/MyCodeComponet'
 import ServerInfo from '@/components/info/ServerInfo'
-import dynamic from 'next/dynamic'
-
-const ComponentB = dynamic(() => import('@/components/info/ServerInfo'))
 
 type SiteInfoPageProps = {
 
-}
-
-
-function Test() {
-  return (
-    <CardContent className='mt-4'>
-        <p>하위 코드를 참조하세요</p>
-        <ComponentB />
-        <CopyBlockComponent text={"//소켓 통신을 위한 코드입니다"} language='js' showLineNumbers={true} />
-      <p className='text-sm' color='#333' >통신을 위한 정보입니다</p>
-    </CardContent>
-  )
 }
 
 function SiteInfoPage(props: SiteInfoPageProps) {
@@ -39,8 +21,10 @@ function SiteInfoPage(props: SiteInfoPageProps) {
         </CardHeader>
         <hr />
         <ServerInfo />
-        <Test>
-        </Test>
+        <CardContent className='mt-4'>
+          <p>하위 코드를 참조하세요</p>
+          <p className='text-sm' color='#333' >통신을 위한 정보입니다</p>
+        </CardContent>
       </Card>
     </div>
   )

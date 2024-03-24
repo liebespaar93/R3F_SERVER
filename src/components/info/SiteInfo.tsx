@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import SocketCard from './SocketCard'
-import ServerInfo from './ServerInfo'
+import ServerInfo from '@/components/info/ServerInfo'
 
 type SiteInfoProps = {
 

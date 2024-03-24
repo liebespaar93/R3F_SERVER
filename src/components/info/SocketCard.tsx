@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, CardContent, CardTitle } from '../ui/card'
+import { CardTitle } from '@/components/ui/card'
 
 
 type SocketCardProps = {

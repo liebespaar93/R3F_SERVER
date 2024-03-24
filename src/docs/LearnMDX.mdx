@@ -1,0 +1,472 @@
+---
+title: learnMDX.mdx
+description: |-
+ 내용입력
+date: Insert datetime string (⇧⌘I or Ctrl+Shift+I)
+preview: 이미지 주소
+draft: false
+tags:
+ - 테그없음
+categories:
+ - 카테고리없음
+---
+
+## MDX (markdown eXtensible) 란?
+
+XML(eXtensible Markup Language)를 구성하기 위한 Markdown형식 파일이라 볼 수 있다.
+JSX (JavaScript XML)와 같이 변환하여 주며 경험상 yaml 파일로도 변환가능한거 같다.
+
+## 환경 설정
+
+작성자가 원하는 환경 설정
+
+- [ ] Nextjs 에서 설정할 것
+- [ ] Github style로 작성될 것
+- [ ] Codeblock 이 PrettyLight 형식으로 작성될 것
+- [ ] 이쁠것 
+
+이것을 목표로 시작해 본다
+
+![image](/docs/LearnMDX/learnmdx.gif)
+
+### nexjs module 형식의 설정
+
+```bash
+npx create-next-app
+```
+
+기본 nextjs app route로 생성 하였다면
+
+package.json이 생성될것이다
+
+![Image](/docs/LearnMDX/package_type.png)
+
+여기 type이라는 설정이 있는데\
+설명을 보면 ```ES modules``` 스타일로 작성할 것이냐 ```commonjs```로 작성할 것이냐에 따라 2가지 속성을 부여 할 수 있다
+
+기본으로는 ```commonjs```로 설정되어 있으며 mdx의 경우 ```ES modules``` 방식만 지원함으로 변경 해주어야 한다.
+
+> [!CAUTION]
+> 다른 파일들도 ES modules 형식에 맞게 설정해 주어야 한다.
+
+상위 ```commonjs``` & ```ES modules```  작동방식이 궁금할 경우 
+
+>  🚀 그림으로 보는 ESM
+>  [![image](https://uicdn.toast.com/toastui/img/og-image.png)](https://ui.toast.com/weekly-pick/ko_20180402)
+>  🔗 링크 : https://ui.toast.com/weekly-pick/ko_20180402
+>
+>  🚀 카카오톡이 ESM로 바꾼 과정
+>  [![image](https://tech.kakao.com/storage/2023/10/jsmlogo.png)](https://tech.kakao.com/2023/10/19/commonjs-esm-migration)
+>  🔗 링크 : https://tech.kakao.com/2023/10/19/commonjs-esm-migration
+
+> [!WARNING]
+> ```"type": "module"```을 설정하면하면<br/>
+> 정상 적으로 작동하던 것도 안되는 것을 볼 수 있을 것이다
+---
+![Image](/docs/LearnMDX/error_type.png)
+
+이는 tailwind의 ```postcss.config.js```의 ```commonjs``` 방식 구동때문에 충돌이 난것이다.\
+이와같은 문제를 해결 하기위하여 ```*.cjs```형식의 파일로 변경해 주는 작업이 필요하다.
+
+#### 🪄 postcss.config.js
+
+| 작업 | 변경전 | 변경후|
+| :-: | :-- | :-- |
+| 파일명 |postcss.config.js|postcss.config.cjs|
+
+#### 🪄 nexjs.config.mjs style
+
+🪄 ```commonjs``` style
+
+```js filename="next.config.js"
+const withMDX = require('@next/mdx')
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Configure `pageExtensions` to include MDX files
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  // Optionally, add any other Next.js config below
+};
+
+export default withMDX(nextConfig);
+```
+
+🪄 ```ES modules``` style
+
+```mjs filename="next.config.mjs"
+import nextMDX from '@next/mdx'
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Configure `pageExtensions` to include MDX files
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  // Optionally, add any other Next.js config below
+};
+
+export default nextMDX(nextConfig);
+```
+
+이렇게 모든 설정이 끝난 후에는 에러가 없이 잘 작동 될 것이다
+
+### Github style Markdown
+
+- [ ] Github style로 remark가 되어야 한다
+- [ ] Github style CSS 코드가 필요하다
+
+
+#### remark github style
+
+Nextjs doc 에 나와있는 MDX 설정 방법이다 
+
+[![image](https://nextjs.org/api/docs-og?title=Configuring:%20MDX)](https://nextjs.org/docs/app/building-your-application/configuring/mdx)
+
+🔗 링크 : https://nextjs.org/docs/app/building-your-application/configuring/mdx
+
+nextjs 에서는 
+
+```mdx-components.tsx``` 파일로 ```*.mdx``` 파일의 스타일을 한번더 변경 해줄 수 있다
+
+```tsx path='mdx-components.tsx'
+import type { MDXComponents } from 'mdx/types'
+import { ImageProps } from 'next/image'
+
+import {createStarryNight} from '@wooorm/starry-night'
+
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+
+  return {
+    img: (props) => (
+      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+      <img
+        sizes="100vw"
+        style={{ width: '100%', height: 'auto', 'max-width': '740px' }}
+        {...(props)}
+      />
+    ),
+    ...components,
+  }
+}
+```
+이러한 방법으로 커스터마이즈 할수도 있고 필자는 플러그 인에 style을 추가해 주는 방식으러 하려고 한다.
+
+
+#### 🍝 next.config.mjs
+
+```mjs filename="next.config.mjs"
+import nextMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import remarkStringify from 'remark-stringify';
+
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
+
+import rehypeStarryNight from './config/rehype-starry-night.js'
+import { rehypeGithubAlerts } from 'rehype-github-alerts'
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Configure `pageExtensions` to include MDX files
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  // Optionally, add any other Next.js config below
+};
+
+const withMDX = nextMDX({
+  extension: /\.mdx?$/,
+  // Add markdown plugins here, as desired
+  options: {
+    remarkPlugins: [
+      remarkParse,
+      remarkGfm,
+      remarkRehype,
+      remarkStringify,
+      remarkFrontmatter,
+      remarkMdxFrontmatter
+    ],
+    rehypePlugins: [rehypeStarryNight, rehypeGithubAlerts],
+  },
+})
+
+export default withMDX(nextConfig);
+
+```
+
+| remarkPlugins | 설명 |
+| :-- | :-- | 
+| remarkParse | remark할떼 묶음 형식을 지원해 준다 |
+| remarkGfm | Github style로 형식을 만들어 준다 |
+| remarkRehype | 깃허브스타일로 형식을 만들어 준다 |
+| remarkStringify | 강조표시를 지원해 주는걸로 안다 |
+| remarkFrontmatter | 상위 해드의 정보를 frontmatter 형식으로 기입해준다 |
+| remarkMdxFrontmatter | MDX파일의 forntmatter 형식을 지원해 준다 |
+
+
+| rehypePlugins | 설명 |
+| :-- | :-- |
+| rehypeStarryNight | ```StarryNight```를 활용해 Codeblock 을 꾸미는 플러그인을 만든것이다 (자세한 사항은 파일 ```rehype-starry-night.js``` 를 참조)  | 
+| | ![iamge](/docs/LearnMDX/rehype_starry_night.png) |
+| rehypeGithubAlerts | Github Alert 형식을 지원해 준다 | 
+| | ![image](/docs/LearnMDX/rehype_github_alert.png) |
+
+
+#### 🍝 rehype-starry-night.js
+
+
+[![image](https://repository-images.githubusercontent.com/490836894/bb6daa71-f594-45ba-85fd-1d4185687382)](https://github.com/wooorm/starry-night)
+
+starry night의 경우 github의 코드 스타일을 만드는 ```PrettyLights```의 project가 licenses 에 의해 멈추고 만든 opensource 이다.\
+사용하기 편하며 최신 ESM을 지원한다 \
+내가 원한 remark 스타일이고 커스터 마이즈도 편리해 선택을 했다.
+
+
+> [!NOTE]
+> 이파일은 상위 플러그인을 위한 ```rehypeStarryNight``` 함수이다.
+
+> [!TIP]
+> 함수의 커스터 마이즈로 ```meta``` 데이터를 사용함으로 ```filename=``` or ```path=```등의 커스터 마이즈도 가능하다\
+> 이러한 사항을 아래 코드에 추가하여 ```props```를 추가할 수 있다
+
+```js filename="rehype-starry-night.js"
+/**
+ * @typedef {import('@wooorm/starry-night').Grammar} Grammar
+ * @typedef {import('hast').ElementContent} ElementContent
+ * @typedef {import('hast').Root} Root
+ */
+
+/**
+ * @typedef Options
+ *   Configuration (optional)
+ * @property {Array<Grammar> | null | undefined} [grammars]
+ *   Grammars to support (default: `common`).
+ */
+
+import {common, createStarryNight} from '@wooorm/starry-night'
+import {toString} from 'hast-util-to-string'
+import {visit} from 'unist-util-visit'
+
+/**
+ * Highlight code with `starry-night`.
+ *
+ * @param {Options | null | undefined} [options]
+ *   Configuration (optional).
+ * @returns
+ *   Transform.
+ */
+export default function rehypeStarryNight(options) {
+  const settings = options || {}
+  const grammars = settings.grammars || common
+  const starryNightPromise = createStarryNight(grammars)
+  const prefix = 'language-'
+
+  /**
+   * Transform.
+   *
+   * @param {Root} tree
+   *   Tree.
+   * @returns {Promise<undefined>}
+   *   Nothing.
+   */
+  return async function (tree) {
+    const starryNight = await starryNightPromise
+
+    visit(tree, 'element', function (node, index, parent) {
+      if (!parent || index === undefined || node.tagName !== 'pre') {
+        return
+      }
+
+      const head = node.children[0]
+
+      if (!head || head.type !== 'element' || head.tagName !== 'code') {
+        return
+      }
+
+      const classes = head.properties.className
+
+      if (!Array.isArray(classes)) return
+
+      const language = classes.find(function (d) {
+        return typeof d === 'string' && d.startsWith(prefix)
+      })
+
+      if (typeof language !== 'string') return
+
+      const scope = starryNight.flagToScope(language.slice(prefix.length))
+
+      // Maybe warn?
+      if (!scope) return
+
+      const fragment = starryNight.highlight(toString(head), scope)
+      const children = /** @type {Array<ElementContent>} */ (fragment.children)
+
+      parent.children.splice(index, 1, {
+        type: 'element',
+        tagName: 'div',
+        properties: {
+          className: [
+            'highlight',
+            'highlight-' + scope.replace(/^source\./, '').replace(/\./g, '-')
+          ]
+        },
+        children: [{type: 'element', tagName: 'pre', properties: {}, children}]
+      })
+    })
+  }
+}
+```
+
+
+
+#### Github CSS
+
+모든 css 스타일을 작성한 파일을 공개해두었다
+
+> 🚀 Github Markdown CSS
+> [![image](https://opengraph.githubassets.com/b9582d336f3ee0818857802266257498ddf909e6990fcbba8001d700740c5fe6/sindresorhus/github-markdown-css)](https://github.com/sindresorhus/github-markdown-css)
+> 🔗 링크 : https://github.com/sindresorhus/github-markdown-css
+
+상위에 있는 css를 가져와 사용하면 github 스타일이 완성된다
+
+> [!TIP]
+> css 에 속성이 적용 되지 않은 변수들이 몇가지 있다 그것을 수정해 주길 바란다
+
+🍝 globals.css
+
+```css filename="globals.css"
+@layer base {
+  :root {
+    /* github css*/
+    --base-size-8: 8px;
+    --base-size-16: 16px;
+
+    ...
+  }
+}
+
+/* github alert css*/
+.markdown-body .markdown-alert .markdown-alert-title > *:first-child {
+  margin-right: var(--base-size-8)
+}
+
+```
+
+코드의 설정을 적용하기 위해선 상위 ```class``` 가 ```markdown-body``` 로 적용되어야 하는데\
+이를 해결하기 위한 방법으로는 2가지가 있다 
+
+🪄 components style
+---
+
+🎄 tree
+
+```tree
+└── src
+   ├── app
+   |  └── markdown
+   |     └── learnmdx
+   |        └── page.tsx
+   ├── components
+   |  └── markdown
+   |     ├── github-markdown.css
+   |     └── GithubStyleMarkdown.tsx
+   ├── lib
+   └── markdown
+      └── LearnMDX.mdx   
+```
+> [!NOTE]
+> components style 로 작성하여 불러오는 방식이다.
+
+🍝 GithubStyleMarkdown.tsx
+
+```tsx filename="GithubStyleMarkdown.tsx"
+import React from 'react'
+import PropTypes from 'prop-types'
+import "@/components/markdown/github-markdown.css";
+
+function GithubStyleMarkdown({ children }: { children: React.ReactNode }) {
+
+  return <div className='markdown-body'>{children}</div>
+}
+
+GithubStyleMarkdown.propTypes = {}
+
+export default GithubStyleMarkdown
+```
+
+🍝 /src/app/docs/learnmdx/page.tsx
+
+```tsx filename="/src/app/docs/learnmdx/page.tsx"
+import React from 'react'
+import PropTypes from 'prop-types'
+import LearnMarkdown from '@/docs/LearnMDX.mdx'
+import GithubStyleMarkdown from '@/components/markdown/GithubStyleMarkdown'
+
+function LearnMDXpage(props: any) {
+  return (
+    <GithubStyleMarkdown>
+      <LearnMarkdown />
+    </GithubStyleMarkdown>
+  )
+}
+
+LearnMDXpage.propTypes = {}
+
+export default LearnMDXpage
+```
+
+🪄 layout style
+---
+
+🎄 tree
+
+```tree
+└── src
+   ├── app
+   |  └── markdown
+   |     └── my-mdx-page
+   |        ├── layout.tsx
+   |        └── page.mdx
+   ├── components
+   |  └── markdown
+   |     └── github-markdown.css
+   ├── lib
+   └── markdown
+```
+
+트리 구조는 상위와 같다 layout을 이용하여 하위 컴포넌트에 class를 부여하는 것이다
+
+🍝 src/app/docs/my-mdx-page/layout.tsx
+
+```tsx 
+import "@/components/markdown/github-markdown.css";
+
+export default function MdxLayout({ children }: { children: React.ReactNode }) {
+  // Create any shared layout or styles here
+  return <div className='markdown-body'>{children}</div>
+}
+```
+
+필자는 첫번째 방식이 익숙하고 좀더 활용범위가 높기에 첫번째 방식을 선택하였다.
+
+개인적으로 편한거 사용하면 될거 같다.
+
+
+Github Primer
+---
+
+> [!NOTE]
+> 깃허브의 코드 스타일이 정리되있다.
+
+필자는 이러한 Github의 코드 작성 방식을 볼 수 있어서 많은 학습을 할 수 있었던거 같다.
+
+또한 나중애 필요한 스타일까지 고려할 수 있기에 한번 쯤 둘러 보는 것을 추천한다.
+
+> 🚀 Github Primer
+> 
+> [![image](https://repository-images.githubusercontent.com/32551735/05499880-6291-11e9-9cdf-32344e46ae8e)](https://github.com/primer)
+> 🔗 링크 : https://github.com/primer
+> 
+> github 디자인을 한눈에 볼 수 있게 정리한 레포지토리다.
+
+고생 하였다 이제 필자처럼 이쁜 ```Github Style``` 의 ```Markdown```을 사용할 수 있게 되었을 것이다
+
