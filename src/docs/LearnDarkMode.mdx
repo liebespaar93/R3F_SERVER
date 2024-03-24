@@ -1,0 +1,116 @@
+---
+title: LearnDarkMode.mdx
+description: |-
+ 다크모드 구현
+date: 2024-03-24T11:07:42Z
+preview: 이미지 주소
+draft: false
+tags:
+ - 다크모드
+categories:
+ - darkmode
+---
+
+## 다크모드
+
+다크모드를 구현하는 방법을 찾아볼것이다\
+처음에는 다크모드를 구현할때 시스템 theme를 어떻게 가져와야하는지 몰라서 한참을 찾았다\
+그러던중 ```window.matchMedia()``` 함수를 찾게 되었고 이함수에\
+```prefers-color-scheme: dark```와 ```prefers-color-scheme: light```를 가져와 현제 테마 상태를 알 수 있엇다.
+
+그렇게 간단하게 토글을 사용해서 ```darkmode```를 구연하였다
+
+🍝 DarkMode.tsx
+
+```tsx filename="DarkMode.tsx"
+"use client"
+
+import { Toggle } from "@radix-ui/react-toggle";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { TiStarHalfOutline, TiWeatherPartlySunny } from "react-icons/ti";
+
+
+function getTheme() {
+  const persistedColorPreference = window.localStorage.getItem('color-theme');
+  if (persistedColorPreference) {
+    return persistedColorPreference;
+  }
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+    return 'dark';
+  if (window.matchMedia('(prefers-color-scheme: light)').matches)
+    return 'light'
+  return 'dark'
+}
+
+export function DarkMode() {
+  const [isDarkMode, setIsDarkMode] = useState("")
+
+  const handleToggle = () => {
+    if (isDarkMode == 'dark')
+      setIsDarkMode('light')
+    else
+      setIsDarkMode('dark')
+  };
+
+  useLayoutEffect(() => {
+    if (!isDarkMode)
+      setIsDarkMode(getTheme());
+    if (isDarkMode == 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      window.localStorage.setItem('color-theme', 'light');
+    }
+    if (isDarkMode == 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      window.localStorage.setItem('color-theme', 'dark');
+    }
+  },[isDarkMode])
+
+  return (
+    <Toggle className="m-auto size-6" onClick={handleToggle}>
+      {isDarkMode == 'dark' ?
+        <TiStarHalfOutline className="text-2xl" /> :
+        <TiWeatherPartlySunny />
+      }
+    </Toggle>
+  );
+};
+```
+
+이때 보다시피 ```data-theme```를 변수로 활용해서 속성을 바꾸어 주기때문에\
+```css``` 를 조금만 손봐도 쉽게 전체적인 다크 모드를 만들어 줄 수 있다\
+
+![image](/docs/DarkMode/darkmode.gif)
+
+🍝 global.css
+
+```css filenam="global.css"
+[data-theme="dark"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+}
+```
