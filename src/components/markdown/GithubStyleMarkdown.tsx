@@ -4,7 +4,7 @@ import "@/components/markdown/github-markdown.css";
 
 function GithubStyleMarkdown({ children }: { children: React.ReactNode }) {
 
-  return <div className='markdown-body'>{children}</div>
+  return <div className='markdown-body p-8'>{children}</div>
 }
 
 GithubStyleMarkdown.propTypes = {}

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import LearnMarkdown from '@/docs/LearnMDX.mdx'
 import GithubStyleMarkdown from '@/components/markdown/GithubStyleMarkdown'
 
-function LearnMDXpage(props: any) {
+function LearnMDXPage(props: any) {
   return (
     <GithubStyleMarkdown>
       <LearnMarkdown />
@@ -11,6 +11,6 @@ function LearnMDXpage(props: any) {
   )
 }
 
-LearnMDXpage.propTypes = {}
+LearnMDXPage.propTypes = {}
 
-export default LearnMDXpage
+export default LearnMDXPage

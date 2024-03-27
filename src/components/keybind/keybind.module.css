@@ -1,0 +1,130 @@
+.keyboard {
+    text-align: center;
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+.keyboard_row {
+    display: inline-block;
+    height: 3em;
+    margin: 0.2em;
+}
+
+.keyboard_row_h1 {
+    height: 1.7em;
+    line-height: 1.4em;
+}
+
+.keyboard_row_h3 {
+    height: 3.3em;
+}
+
+.keyboard_row > * {
+    position: relative;
+    background: #333;
+    text-align: center;
+    color: #eee;
+    float: left;
+    border-radius: 0.3em;
+    margin: 0.2em;
+    padding: 0.2em;
+    width: 3.3em;
+    height: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-user-select: none;
+    border: 1px solid #444;
+    box-shadow: 0 0.2em 0 0.05em #222;
+    border-bottom-color: #555;
+}
+
+.keyboard_row_h1 > div {
+    width: 3.5em;
+}
+
+.keyboard_row > div[data-pressed],
+.keyboard_row > div:active {
+    background: #2a2a2a;
+    color: #aaa;
+    position: relative;
+    top: 0.2em;
+    box-shadow: 0 0 0 0.05em black;
+}
+
+.key_w3 {
+    width: 4.6em;
+}
+
+.key_w4 {
+    width: 6em;
+}
+
+.key_w5 {
+    width: 6.5em;
+}
+
+.key_w6 {
+    width: 8.3em;
+}
+
+.key_space {
+    width: 18em;
+}
+.key_double {
+    padding: 0;
+}
+
+.key_double > * {
+    padding: 0;
+}
+
+.key_letter {
+    line-height: 2.8em;
+}
+
+.key_bottom_left > * {
+    position: absolute;
+    text-align: left;
+    bottom: 0.4em;
+    left: 0.4em;
+}
+
+.key_bottom_right > * {
+    position: absolute;
+    text-align: right;
+    bottom: 0.4em;
+    right: 0.4em;
+}
+
+.key_fn > * {
+    font-size: 0.6em;
+    line-height: 1em;
+    padding-top: 1.2em;
+    padding-right: 0.2em;
+    text-align: right;
+    float: right;
+}
+
+.key_word > * {
+    font-size: 0.8em;
+}
+
+.key_arrow_tall > *,
+.key_arrow > * {
+    font-size: 0.5em;
+    line-height: 3em;
+}
+
+.key_arrow {
+    height: 1.8em;
+    margin-top: 1.7em;
+    line-height: 0.5em;
+}
+
+.key_arrow_tall > * {
+    padding-top: 0.2em;
+}
+
+.keyboard > .keyboard__row {
+    text-align: center;
+}

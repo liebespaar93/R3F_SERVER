@@ -10,6 +10,11 @@ import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
 import rehypeStarryNight from './config/rehype-starry-night.js'
 import { rehypeGithubAlerts } from 'rehype-github-alerts'
 
+// next-ws
+import { verifyPatch } from 'next-ws/server/index.js'
+
+verifyPatch()
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configure `pageExtensions` to include MDX files

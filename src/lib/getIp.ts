@@ -1,4 +1,7 @@
 "use server"
+
+import { noteServerLog } from "./log/server_logger"
+
 export async function getIp() {
   "use server"
   await fetch('get', {
@@ -11,6 +14,6 @@ export async function getIp() {
       data: "need ip"
     })
   }).then((e) => {
-    console.log(e.json())
+    noteServerLog(e.json())
   })
 }

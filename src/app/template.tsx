@@ -11,7 +11,7 @@ type RootTemplateProps = {
 function RootTemplate(props: RootTemplateProps) {
 
   return (
-    <div>
+    <div className='h-full flex flex-col'>
       <div className='flex flex-row border-b-4 p-4'>
         <Link href='/'><div className='w-auto text-3xl '> R3F </div></Link>
         <div className='ml-auto space-x-5 space-x-reverse flex flex-row-reverse'>
