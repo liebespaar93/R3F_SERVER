@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Link from 'next/link'
 
 import { DarkMode } from '@/components/theme/DarkMode'
-import { DEFAULT_DOC_URL } from '@/routes'
+import { DEFAULT_DOC_URL, DEFAULT_SOCKET_PAGE_URL } from '@/routes'
 
 type RootTemplateProps = {
 
@@ -17,9 +17,12 @@ function RootTemplate(props: RootTemplateProps) {
         <div className='ml-auto space-x-5 space-x-reverse flex flex-row-reverse'>
           <DarkMode />
           <Link href={DEFAULT_DOC_URL} className='m-auto'>Docs</Link>
+          <Link href={DEFAULT_SOCKET_PAGE_URL} className='m-auto'>Socket</Link>
         </div>
       </div>
+      <div className='overflow-scroll'>
       {props.children}
+      </div>
     </div>
   )
 }

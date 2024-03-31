@@ -3,7 +3,7 @@
 import { WebSocketProvider } from 'next-ws/client';
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { DEFAULT_SOCKET_URL } from '@/routes';
 
 type ProviderProps = {
 
@@ -11,10 +11,12 @@ type ProviderProps = {
 
 function Provider(props: ProviderProps) {
   return (
-    <WebSocketProvider
-      url={'ws://localhost:' + (process.env.PORT ?? '3000') + '/api/ws'}>
-      {props.children}
-    </WebSocketProvider>
+    <>
+      <WebSocketProvider
+        url={DEFAULT_SOCKET_URL}>
+        {props.children}
+      </WebSocketProvider>
+    </>
   )
 }
 

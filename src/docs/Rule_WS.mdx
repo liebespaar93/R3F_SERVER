@@ -1,0 +1,213 @@
+---
+title: Rule_Listen
+description: |-
+ 내용입력
+date: Insert datetime string (⇧⌘I or Ctrl+Shift+I)
+preview: 이미지 주소
+draft: false
+tags:
+ - 테그없음
+categories:
+ - 카테고리없음
+---
+
+
+## 소켓 주소
+
+URL : {process.env.NEXT_PUBLIC_SOCKET_URL}/api/ws
+
+## SOCKET 환경 설정
+
+> [!TIP]
+> ```SOCKET_URL``` 소켓주소를 입력해 주세요
+
+```jsx
+'use client';
+
+import { WebSocketProvider } from 'next-ws/client';
+
+function Provider(props: any) {
+  return (
+    <WebSocketProvider
+      url={SOCKET_URL}>
+      {props.children}
+    </WebSocketProvider>
+  )
+}
+```
+
+> [!NOTE]
+> ```RootLayout.tsx```에 프로바이더를 넣어 줍니다
+
+```jsx
+export default function RootLayout(
+  { children } : Readonly<{children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className="h-full">
+      <body className={'h-full ' + inter.className}>
+        <Provider>
+          {children}
+        </Provider>
+      </body>
+    </html>
+  );
+}
+```
+
+
+## Rule
+
+### socket data type 
+
+````ts
+type userInfo = {
+  id: string,
+  nickname? : string,
+  state?: string[],
+  room?: string,
+}
+
+type socketMsg = {
+  type: string,
+  msg?: string | null
+}
+
+type socketSend = {
+  sendForm :userInfo
+  sendTo? : userInfo
+} & socketMsg
+
+type socketRecv = {
+  recvFrom: userInfo
+} & socketMsg
+```` 
+
+### 소켓 send 규칙 
+
+| 규칙 | 전송데이터 타입 | 반환 리스너 | 전송 | 내용 |
+| :-- | :-: | :-: | :-: |:-- |
+| onOpen | socketSend | my_info  | client | 클라이언트 소켓의 id를 반환해 줍니다 |
+| update_user | socketSend | update_user | all | 업데이트된 유저의 정보를 모든 접속자에게 전송합니다. |
+| old_user | socketSend | old_user | target client | 특정 유저에게 자신의 정보를 전달한다. |
+| msg | socketSend | msg | all | 메세지를 전달한다 |
+
+### 소켓 listen 규칙
+
+| 규칙 | 수신데이터 타입 | 내용 |
+| :-- | :-: | :-- | 
+|  my_info | socketRecv | 현재 자신의 socket의 정보를 받는다 |
+|  new_user | socketRecv | 새로운 접속자의 유저정보를 받는다. |
+|  old_user | socketRecv | 나의 접속을 수신한 client 소켓의 정보를 받는다. |
+|  update_user | socketRecv | 특정 유저의 업데이트된 데이터를 받는다. |
+|  leave_user | socketRecv | 떠난 유져의 정보를 받는다. | 
+
+
+### client 실습 코드
+
+````jsx
+export default function SocketListen(props: SocketListenProps) {
+  /*** socket setting start ***/
+  const [ws, setWs] = useState<WebSocket | null>(useWebSocket());
+  const [userInfo, setUserInfo] = useState<userInfo>({ id: '', nickname: 'No Nickname' });
+  const [userList, setUserList] = useState<userInfo[]>([]);
+  const [tryConnect, setTryConnect] = useState(0);
+
+  /**
+   * @props ev: Event
+   * @socket on open
+   * @note 접속 성공시 전달하는 메세지 입니다.
+   * - 서버에서 socket id를 요청 합니다.
+   */
+  const onOpen = useCallback((ev: Event) => {
+    importantClientLog("onOpen listen", ev);
+    if (!ws)
+      return;
+    ws.send(JSON.stringify({ type: 'onOpen', sendForm: { id: '' } } satisfies socketSend))
+    setTryConnect(0);
+  }, [ws]);
+
+  /**
+   * @props ev: Event
+   * @socket on error
+   * @note 에러 메세지를 처리합니다
+   * - socket의 id 가 없을때
+   * - 서버와 통신이 안될때
+   */
+  const onError = useCallback((ev: Event) => {
+    importantClientLog("onError listen", ev)
+  }, []);
+
+  /**
+   * @props ev: CloseEvent
+   * @socket on close
+   * @note 에러 메세지를 처리합니다
+   * - socket의 id 가 없을때
+   * - 서버와 통신이 안될때
+   */
+  const onClose = useCallback((ev: CloseEvent) => {
+    importantClientLog("onClose listen", ev)
+    setTimeout(() => {
+      if (tryConnect > 5)
+        return errorClientLog("can't Reconnect server", "close socket");
+      noteClientLog('Try Reconnect server', tryConnect)
+      setTryConnect(tryConnect + 1);
+      setWs(new WebSocket(DEFAULT_SOCKET_URL));
+    }, 1000);
+  }, [tryConnect])
+
+  /**
+   * @props ev: MessageEvent<Blob>
+   * @socket on message
+   * @note 수신 메세지를 처리합니다
+   * - Connect Server
+   * @need blob을 사용하여 나중에 데이터 쪼개 보내기 필요
+   */
+  const onMessage = useCallback(async (ev: MessageEvent<Blob>) => {
+    importantClientLog("onMessage listen")
+    if (!ws)
+      return;
+    const text: string = await ev.data.text()
+    const recv: socketRecv = await JSON.parse(text);
+    // tipClientLog(recv);
+    const send: socketSend = { type: recv.type, sendForm: userInfo };
+
+    if (recv.type == 'my_info')
+      return client_socket_on_msg_my_info({ ws, recv, send }, setUserInfo)
+    if (recv.type == 'new_user')
+      return client_socket_on_msg_new_user({ ws, recv, send }, userList, setUserList)
+    if (recv.type == 'old_user')
+      return client_socket_on_msg_old_user({ ws, recv, send }, userList, setUserList)
+    if (recv.type == 'update_user')
+      return client_socket_on_msg_update_user({ ws, recv, send }, userList, setUserList)
+    if (recv.type == 'leave_user')
+      return client_socket_on_msg_leave_user({ ws, recv, send }, userList, setUserList)
+  }, [userInfo, userList, ws]);
+
+  /**
+   * @note ws 페이지설정
+   * @tip onload 와 unload를 감지하여 eventlistener를 설정합니다
+   */
+  useEffect(() => {
+    if (ws) {
+      ws.addEventListener('open', onOpen)
+      ws.addEventListener('message', onMessage);
+      ws.addEventListener('error', onError);
+      ws.addEventListener('close', onClose);
+      return () => {
+        ws.removeEventListener('open', onOpen);
+        ws.removeEventListener('message', onMessage);
+        ws.removeEventListener('error', onError);
+        ws.removeEventListener('close', onClose);
+      }
+    }
+  }, [onOpen, onMessage, onError, onClose, ws])
+
+  /*** socket setting done ***/
+  return (
+    <div className=' w-full h-full flex flex-col'>
+      {props.children}
+    </div>
+  )
+}
+````

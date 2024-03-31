@@ -375,7 +375,7 @@ export default function SocketPage() {
 이제 서버쪽\ 
 서버에서는 onOPEN이라는 type을 가진 메세지가 오면 socket id 를 담아 전송해 주는 코드를 짜보자\
 
-🍝  server licenses message controll
+🍝  server listen message controll
 ```jsx 
 client.on('message', async (message) => {
   const socket_id = request.headers['sec-websocket-key'];

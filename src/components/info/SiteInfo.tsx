@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import ServerInfo from '@/components/info/ServerInfo'
+import GithubStyleMarkdown from '@/components/markdown/GithubStyleMarkdown'
+import Rule_WS from '@/docs/Rule_WS.mdx'
 
 type SiteInfoProps = {
 
@@ -9,7 +11,7 @@ type SiteInfoProps = {
 
 function SiteInfo(props: SiteInfoProps) {
   return (
-    <div>
+    <div className='w-full overflow-scroll'>
       <Card className='w-full p-4 m-4'>
         <CardHeader>
           <CardTitle className='m-auto'>
@@ -20,10 +22,10 @@ function SiteInfo(props: SiteInfoProps) {
           </CardDescription>
         </CardHeader>
         <hr />
-        <ServerInfo />
-        <CardContent className='mt-4'>
-          <p>하위 코드를 참조하세요</p>
-          <p className='text-sm' color='#333' >통신을 위한 정보입니다</p>
+        <CardContent className=''>
+          <GithubStyleMarkdown>
+            <Rule_WS />
+          </GithubStyleMarkdown>
         </CardContent>
       </Card>
     </div>
